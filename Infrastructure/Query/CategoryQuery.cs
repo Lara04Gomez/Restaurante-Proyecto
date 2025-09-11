@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Infrastructure.Data;
+using Domain.Entities;
+using Application.Interfaces.ICategory;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructure.Query
+{
+    public class CategoryQuery : ICategoryQuery
+    {
+        private readonly AppDbContext _context;
+        public CategoryQuery(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<bool> CategoryExistAsync(int id)
+        {
+            return await _context.Categories.AnyAsync(c => c.Id == id);
+        }
+
+        public async Task<List<Category>> GetAllCategories()
+        {
+            return await _context.Categories.ToListAsync();
+        }
+
+        public async Task<Category?> GetCategoryById(int id)
+        {
+            return await _context.Categories.FindAsync(id).AsTask();
+        }
+    }
+}

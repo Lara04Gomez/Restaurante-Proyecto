@@ -1,0 +1,40 @@
+﻿using Application.Interfaces.IDish;
+using Domain.Entities;
+using Infrastructure.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Infrastructure.Command
+{
+    public class DishCommand : IDishCommand
+    {
+        private readonly AppDbContext _context;
+
+        public DishCommand(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task CreateDish(Dish dish)
+        {
+            _context.Dishes.Add(dish); //Agrego el cliente a la base 
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateDish(Dish dish)
+        {
+            _context.Dishes.Update(dish);
+            await _context.SaveChangesAsync();
+        }
+    
+        public async Task RemoveDish(Dish dish)
+        {
+            _context.Dishes.Remove(dish);
+            await _context.SaveChangesAsync();
+
+        }
+    }
+}
