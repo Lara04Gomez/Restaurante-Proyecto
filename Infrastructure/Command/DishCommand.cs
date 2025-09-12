@@ -20,7 +20,7 @@ namespace Infrastructure.Command
 
         public async Task CreateDish(Dish dish)
         {
-            _context.Dishes.Add(dish); //Agrego el cliente a la base 
+            _context.Dishes.Add(dish); 
             await _context.SaveChangesAsync();
         }
 

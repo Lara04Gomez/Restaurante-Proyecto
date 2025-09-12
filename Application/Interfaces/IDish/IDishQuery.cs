@@ -1,5 +1,6 @@
 ﻿using Application.Enums;
 using Domain.Entities;
+using Application.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Application.Interfaces.IDish
     public interface IDishQuery
     {
         Task<Dish?> GetDishById(Guid id);
-        Task<bool> DishExists(string name);
+        Task<bool> DishExists(string name, Guid? id);
         Task<IEnumerable<Dish>> GetAllAsync(string? name = null, int? categoryId = null, bool? onlyActive = true, OrderPrice? priceOrder = OrderPrice.ASC);
         Task<List<Dish>> GetAllDishes();
 

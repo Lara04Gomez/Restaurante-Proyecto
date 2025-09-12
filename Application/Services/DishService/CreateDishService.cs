@@ -27,8 +27,8 @@ namespace Application.Services.DishServices
 
         public async Task<DishResponse?> CreateDish(DishRequest dishRequest)
         {
-            //validaciones
-            var existingDish = await _dishQuery.DishExists(dishRequest.Name);
+
+            var existingDish = await _dishQuery.DishExists(dishRequest.Name, null);
 
             if (existingDish)
             {

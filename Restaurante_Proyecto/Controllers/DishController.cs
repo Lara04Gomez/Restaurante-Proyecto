@@ -50,21 +50,7 @@ namespace MenuDigital.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateDish([FromBody] DishRequest dishRequest)
         {
-            ////if (dishRequest == null)
-            ////{
-            ////    throw new RequiredParameterException("Required dish data.");
-            ////}
-            ////if (string.IsNullOrWhiteSpace(dishRequest.Name))
-            ////{
-            ////    throw new RequiredParameterException("Name is required.");
-            ////}
-            ////if (dishRequest.Category == 0)
-            ////{
-            ////    throw new RequiredParameterException("Category is required.");
-            ////}
-            //if (dishRequest.Price <= 0)
-            //{
-            //    throw new InvalidateParameterException("Price must be greater than zero.");
+
             //}
 
             var createdDish = await _createDish.CreateDish(dishRequest);
@@ -73,147 +59,116 @@ namespace MenuDigital.Controllers
             {
                 throw new ConflictException("Un plato con ese nombre ya existe.");
 
-            }   
-                return CreatedAtAction(nameof(Search), new { id = createdDish.Id }, createdDish);
-
-            
-        }
-            // GETs
-            // GET with filters
-            /// <summary>
-            /// Busca platos.
-            /// </summary>
-            /// <remarks>
-            /// Obtiene una lista de platos del menú con opciones de filtrado y ordenamiento.
-            /// </remarks>
-            //("search")
-            [HttpGet]
-            [SwaggerOperation(
-            Summary = "Buscar platos",
-            Description = "Obtiene una lista de platos del menú con opciones de filtrado y ordenamiento."
-            )]
-            [ProducesResponseType(typeof(IEnumerable<DishResponse>), StatusCodes.Status200OK)]
-            [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
-            [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
-            public async Task<IActionResult> Search(
-                [FromQuery] string? name,
-                [FromQuery] int? categoryId,
-                [FromQuery] OrderPrice? orderPrice = OrderPrice.ASC,
-                [FromQuery] bool onlyActive = true)
-            {
-
-                /*if (!string.IsNullOrWhiteSpace(orderPrice))
-                {
-                    var normalized = orderPrice.Trim().ToUpperInvariant();
-                    if (normalized != "ASC" && normalized != "DESC")
-                    {
-                        throw new OrderPriceException("Invalid order. Use ASC or DESC.");
-                    }
-                }*/
-                if (categoryId != 0 && categoryId != null)
-                {
-                    var categoryExists = await _CategoryExist.CategoryExist(categoryId.Value);
-                    if (!categoryExists)
-                    {
-                        throw new NotFoundException($"Categoria con ID {categoryId} no encontrado.");
-                    }
-                }
-
-                if (orderPrice != null)
-                {
-                    if (orderPrice != OrderPrice.ASC && orderPrice != OrderPrice.DESC)
-                    {
-                        throw new OrderPriceException("Invalido orden.Se usa ASC o DESC.");
-                    }
-                }
-                var list = await _SearchAsync.SearchAsync(name, categoryId, onlyActive, orderPrice);
-                if (list == null || !list.Any())
-                {
-                    throw new NotFoundException("No hay platos encontrados con ese criterio.");
-                }
-
-                return Ok(list);
-
             }
-
-            ////
-            ///// <summary>
-            ///// Obtiene un plato por su ID.
-            ///// </summary>
-            ///// <remarks>
-            ///// Busca un plato específico en el menú usando su identificador único.
-            ///// </remarks>
-            ////
-            //[HttpGet("{id}")]
-            //[SwaggerOperation(
-            //Summary = "Buscar platos por ID",
-            //Description = "Buscar platos por ID."
-            //)]
-            //[ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
-            //[ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
-            //private async Task<IActionResult> GetDishById(Guid id)
-            //{
-            //    var dish = await _dishService.GetDishById(id);
-            //    if (dish == null)
-            //    {
-            //        throw new NotFoundException($"Dish with ID {id} not found.");
-            //    }
-            //    return Ok(dish);
-            //}
+            return CreatedAtAction(nameof(Search), new { id = createdDish.Id }, createdDish);
 
 
-            // PUT
-            /// <summary>
-            /// Actualizar plato existente.
-            /// </summary>
-            /// <remarks>
-            /// Actualiza todos los campos de un plato existente en el menú.
-            /// </remarks>
+        }
+        // GETs
+        // GET with filters
+        /// <summary>
+        /// Busca platos.
+        /// </summary>
+        /// <remarks>
+        /// Obtiene una lista de platos del menú con opciones de filtrado y ordenamiento.
+        /// </remarks>
+        //("search")
+        [HttpGet]
+        [SwaggerOperation(
+        Summary = "Buscar platos",
+        Description = "Obtiene una lista de platos del menú con opciones de filtrado y ordenamiento."
+        )]
+        [ProducesResponseType(typeof(IEnumerable<DishResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Search(
+            [FromQuery] string? name,
+            [FromQuery] int? categoryId,
+            [FromQuery] OrderPrice? orderPrice = OrderPrice.ASC,
+            [FromQuery] bool onlyActive = true)
+        {
 
-            [HttpPut("{id}")]
-            [SwaggerOperation(
-            Summary = "Actualizar plato existente",
-            Description = "Actualiza todos los campos de un plato existente en el menú."
-            )]
-            [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
-            [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
-            [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
-            [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
-            public async Task<IActionResult> UpdateDish(Guid id, [FromBody] DishUpdateRequest dishRequest)
+            if (categoryId != 0 && categoryId != null)
             {
-                //if (dishRequest == null)
-                //{
-                //    throw new RequiredParameterException("Required dish data.");
-                //}
-                //if (string.IsNullOrWhiteSpace(dishRequest.Name))
-                //{
-                //    throw new RequiredParameterException("Name is required.");
-                //}
-                //if (dishRequest.Category == 0)
-                //{
-                //    throw new RequiredParameterException("Category is required.");
-                //}
-                //if (dishRequest.Price <= 0)
-                //{
-                //    throw new InvalidateParameterException("Price must be greater than zero.");
-                //}
-                var categoryExists = await _CategoryExist.CategoryExist(dishRequest.Category);
+                var categoryExists = await _CategoryExist.CategoryExist(categoryId.Value);
                 if (!categoryExists)
                 {
-                    throw new NotFoundException($"La categoria con ID {dishRequest.Category} no se encuentra.");
+                    throw new NotFoundException($"Categoria con ID {categoryId} no encontrado.");
                 }
-                var result = await _UpdateDish.UpdateDish(id, dishRequest);
-                if (result.NotFound)
-                {
-                    throw new NotFoundException($"El plato con el {id} no se encuentra.");
-                }
-
-                if (result.NameConflict)
-                {
-                    throw new ConflictException($"El plato {dishRequest.Name} ya existe");
-                }
-
-                return Ok(result.UpdatedDish);
             }
-     }
- }
+
+            if (orderPrice != null)
+            {
+                if (orderPrice != OrderPrice.ASC && orderPrice != OrderPrice.DESC)
+                {
+                    throw new OrderPriceException("Invalido orden.Se usa ASC o DESC.");
+                }
+            }
+            var list = await _SearchAsync.SearchAsync(name, categoryId, onlyActive, orderPrice);
+            if (list == null || !list.Any())
+            {
+                throw new NotFoundException("No hay platos encontrados con ese criterio.");
+            }
+
+            return Ok(list);
+
+        }
+
+
+
+
+        // PUT
+        /// <summary>
+        /// Actualizar plato existente.
+        /// </summary>
+        /// <remarks>
+        /// Actualiza todos los campos de un plato existente en el menú.
+        /// </remarks>
+
+        [HttpPut("{id}")]
+        [SwaggerOperation(
+        Summary = "Actualizar plato existente",
+        Description = "Actualiza todos los campos de un plato existente en el menú."
+        )]
+        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> UpdateDish(Guid id, [FromBody] DishUpdateRequest dishRequest)
+        {
+            //if (dishRequest == null)
+            //{
+            //    throw new RequiredParameterException("Required dish data.");
+            //}
+            //if (string.IsNullOrWhiteSpace(dishRequest.Name))
+            //{
+            //    throw new RequiredParameterException("Name is required.");
+            //}
+            //if (dishRequest.Category == 0)
+            //{
+            //    throw new RequiredParameterException("Category is required.");
+            //}
+            //if (dishRequest.Price <= 0)
+            //{
+            //    throw new InvalidateParameterException("Price must be greater than zero.");
+            //}
+            var categoryExists = await _CategoryExist.CategoryExist(dishRequest.Category);
+            if (!categoryExists)
+            {
+                throw new NotFoundException($"La categoria con ID {dishRequest.Category} no se encuentra.");
+            }
+            var result = await _UpdateDish.UpdateDish(id, dishRequest);
+            if (result.NotFound)
+            {
+                throw new NotFoundException($"El plato con el {id} no se encuentra.");
+            }
+
+            if (result.NameConflict)
+            {
+                throw new ConflictException($"El plato {dishRequest.Name} ya existe");
+            }
+
+            return Ok(result.UpdatedDish);
+        }
+    }
+}

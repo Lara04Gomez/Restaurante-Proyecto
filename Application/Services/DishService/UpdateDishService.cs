@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Application.Services.DishServices
 {
@@ -30,7 +31,7 @@ namespace Application.Services.DishServices
             {
                 return new UpdateDishResult { NotFound = true };
             }
-            var alreadyExist = await _dishQuery.DishExists(DishUpdateRequest.Name);
+            var alreadyExist = await _dishQuery.DishExists(DishUpdateRequest.Name, id);
             if (alreadyExist)
             {
                 return new UpdateDishResult { NameConflict = true };

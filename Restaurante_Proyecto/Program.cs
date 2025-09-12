@@ -15,13 +15,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Restaurante_Proyecto.Middlewares;
 using System.Reflection;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
-// Configurar EF Core con SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -41,9 +41,20 @@ builder.Services.AddScoped<ICategoryExist, CategoryExists>();
 
 
 builder.Services.AddControllers();
-//Validation with FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<DishRequestValidator>();
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -52,17 +63,17 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Restaurante API",
         Version = "1.0",
-        Description = "API para la gestión de platos en un restaurante",
+        Description = "API para la gestiÃ³n de platos en un restaurante",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
             Name = "Restaurant API Support",
-            
+
         }
     });
-   c.MapType<OrderPrice>(() => new Microsoft.OpenApi.Models.OpenApiSchema
+    c.MapType<OrderPrice>(() => new Microsoft.OpenApi.Models.OpenApiSchema
     {
         Type = "string",
-        Enum = new List <Microsoft.OpenApi.Any.IOpenApiAny>
+        Enum = new List<Microsoft.OpenApi.Any.IOpenApiAny>
         {
             new Microsoft.OpenApi.Any.OpenApiString("ASC"),
             new Microsoft.OpenApi.Any.OpenApiString("DESC")
@@ -75,16 +86,41 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant());
+        }
+    });
 }
 
-// Middleware custom for exception handling
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Se produjo un error al migrar la base de datos.");
+    }
+}
+
+
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();

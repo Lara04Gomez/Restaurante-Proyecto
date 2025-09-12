@@ -52,7 +52,6 @@ namespace Infrastructure.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(25);
                 entity.Property(e => e.Description).HasMaxLength(255);
-                // "order" indica el orden de visualización de las categorías, no es una relación con la entidad Order
                 entity.Property(e => e.Order).IsRequired();
 
                 // entradas
@@ -106,7 +105,6 @@ namespace Infrastructure.Data
                 entity.ToTable("Order");
                 entity.HasKey(e => e.OrderId);
                 entity.Property(e => e.Price).HasPrecision(18, 2).IsRequired();
-                //entity.Property(e => e.Notes).HasMaxLength(255); Si lo comento o no esta, EF Core lo crea como nvarchar(max)
                 entity.Property(e => e.OrderDate).IsRequired();
                 entity.Property(e => e.CreateDate).IsRequired();
 

@@ -50,7 +50,7 @@ namespace Infrastructure.Query
             }
             if (onlyActive.HasValue && onlyActive.Value)
                 query = query.Where(d => d.Available);
-          
+
 
             return await query
             .Include(d => d.Category)
@@ -67,9 +67,18 @@ namespace Infrastructure.Query
             return await _context.Dishes.FindAsync(id).AsTask();
         }
 
-        public async Task<bool> DishExists(string name)
+        public async Task<bool> DishExists(string name, Guid? id)
         {
-            return await _context.Dishes.AnyAsync(d => d.Name == name);
+            var query = _context.Dishes.AsQueryable();
+
+            if (id.HasValue)
+            {
+
+                query = query.Where(d => d.DishId != id.Value);
+            }
+
+
+            return await query.AnyAsync(d => d.Name == name);
         }
     }
 }

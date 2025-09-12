@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services.DishServices
 {
-    public class SearchAsyncDishesService :ISearchAsync
+    public class SearchAsyncDishesService : ISearchAsync
     {
         private readonly IDishCommand _dishCommand;
         private readonly IDishQuery _dishQuery;
@@ -26,7 +26,7 @@ namespace Application.Services.DishServices
         public async Task<IEnumerable<DishResponse?>> SearchAsync(string? name, int? categoryId, bool? onlyActive = true, OrderPrice? priceOrder = OrderPrice.ASC)
         {
 
-            var list = await _dishQuery.GetAllAsync(name, categoryId, onlyActive,priceOrder);
+            var list = await _dishQuery.GetAllAsync(name, categoryId, onlyActive, priceOrder);
 
 
 
@@ -44,7 +44,7 @@ namespace Application.Services.DishServices
             }).ToList();
         }
 
-        
+
     }
 }
 

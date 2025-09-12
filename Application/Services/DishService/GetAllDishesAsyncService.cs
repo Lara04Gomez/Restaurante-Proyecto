@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Application.Services.DishServices
 {
-    public class GetAllDishesAsyncService: IGetAllDishesAsync
+    public class GetAllDishesAsyncService : IGetAllDishesAsync
     {
         private readonly IDishCommand _dishcommand;
         private readonly IDishQuery _dishQuery;
         private readonly ICategoryQuery _categoryQuery;
 
-        public GetAllDishesAsyncService(IDishCommand dishcommand,IDishQuery dishQuery, ICategoryQuery categoryQuery)
+        public GetAllDishesAsyncService(IDishCommand dishcommand, IDishQuery dishQuery, ICategoryQuery categoryQuery)
         {
             _dishcommand = dishcommand;
             _dishQuery = dishQuery;

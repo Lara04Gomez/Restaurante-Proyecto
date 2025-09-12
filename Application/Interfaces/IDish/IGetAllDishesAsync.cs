@@ -9,7 +9,7 @@ namespace Application.Interfaces.IDish
 {
     public interface IGetAllDishesAsync
     {
-        // List
+        
         Task<List<DishResponse>> GetAllDishesAsync();
     }
 }

@@ -26,12 +26,12 @@ namespace Restaurante_Proyecto.Middlewares
         {
             try
             {
-                // Continue processing the request
+               
                 await _next(context);
             }
             catch (Exception ex)
             {
-                // Log the exception 
+               
                 _logger.LogError(ex, $"Catch Error: {ex.Message}");
                 await HandleExceptionAsync(context, ex);
             }
@@ -48,12 +48,7 @@ namespace Restaurante_Proyecto.Middlewares
 
             switch (ex)
             {
-                //case RequiredParameterException:
-                //    statusCode = HttpStatusCode.BadRequest;
-                //    break;
-                //case InvalidateParameterException:
-                //    statusCode = HttpStatusCode.BadRequest;
-                //    break;
+              
                 case NotFoundException:
                     statusCode = HttpStatusCode.NotFound;
                     break;
