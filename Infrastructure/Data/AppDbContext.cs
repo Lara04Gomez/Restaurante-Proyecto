@@ -76,11 +76,11 @@ namespace Infrastructure.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(25);
                 entity.HasData(
-                new Status { Id = 1, Name = "Pending" },
-                new Status { Id = 2, Name = "In progress" },
-                new Status { Id = 3, Name = "Ready" },
-                new Status { Id = 4, Name = "Delivery" },
-                new Status { Id = 5, Name = "Closed" } 
+                new Status { Id = 1, Name = "Pendiente" },
+                new Status { Id = 2, Name = "En preparación" },
+                new Status { Id = 3, Name = "Listo" },
+                new Status { Id = 4, Name = "Entregado" },
+                new Status { Id = 5, Name = "Cancelado" } 
                  );
             });
 
@@ -104,8 +104,10 @@ namespace Infrastructure.Data
             {
                 entity.ToTable("Order");
                 entity.HasKey(e => e.OrderId);
+                entity.Property(e => e.OrderId).ValueGeneratedOnAdd();
+                entity.Property(e => e.DeliveryTo).HasMaxLength(255);
                 entity.Property(e => e.Price).HasPrecision(18, 2).IsRequired();
-                entity.Property(e => e.OrderDate).IsRequired();
+                entity.Property(e => e.UpdateDate).IsRequired();
                 entity.Property(e => e.CreateDate).IsRequired();
 
                 // Relationship with DeliveryType
@@ -130,6 +132,7 @@ namespace Infrastructure.Data
             {
                 entity.ToTable("OrderItem");
                 entity.HasKey(e => e.OrderItemId);
+                entity.Property(e => e.OrderItemId).ValueGeneratedOnAdd();
                 entity.Property(e => e.Quantity).IsRequired();
                 entity.Property(e => e.CreateDate).IsRequired();
 
@@ -140,14 +143,6 @@ namespace Infrastructure.Data
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
-
-
         }
-
-
-
-
-
-
     }
 }

@@ -8,8 +8,8 @@ namespace Application.Models.Request
 {
     public class OrderRequest
     {
-        public string DeliveryTo { get; set; }
-        public string Notes { get; set; }
-        public int Price { get; set; }
+        public List<Items?> items { get; set; }
+        public Delivery? delivery { get; set; }
+        public string? notes { get; set; }
     }
 }

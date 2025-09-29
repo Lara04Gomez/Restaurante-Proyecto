@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Application.Interfaces.IOrder;
+using Application.Interfaces.IOrder.Repository;
 using Infrastructure.Data;
 
 namespace Infrastructure.Command
@@ -19,15 +19,17 @@ namespace Infrastructure.Command
         {
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
-        }
-        public async Task RemoveOrder(Domain.Entities.Order order)
-        {
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
+
         }
         public async Task UpdateOrder(Domain.Entities.Order order)
         {
             _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveOrder(Domain.Entities.Order order)
+        {
+            _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
         }
     }

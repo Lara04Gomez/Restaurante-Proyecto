@@ -15,7 +15,7 @@ namespace Application.Models.Request
 
         public decimal Price { get; set; }
 
-        public int Category { get; set; }
+        public int CategoryId { get; set; }
 
         public string? Image { get; set; }
 

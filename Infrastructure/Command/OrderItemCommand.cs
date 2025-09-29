@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Application.Interfaces.IOrderItem;
+using Application.Interfaces.IOrderItem.Repository;
 using Domain.Entities;
 using Infrastructure.Data;
 
@@ -21,17 +21,21 @@ namespace Infrastructure.Command
             _context.OrderItems.Add(orderItem);
             await _context.SaveChangesAsync();
         }
-
-        public async Task RemoveOrderItem(OrderItem orderItem)
+        public async Task InsertOrderItemRange(List<OrderItem> orderItems)
         {
-            _context.OrderItems.Remove(orderItem);
+            _context.OrderItems.AddRange(orderItems);
             await _context.SaveChangesAsync();
         }
+        public async Task RemoveOrderItem(IEnumerable<OrderItem> orderItem)
+        {
+            _context.OrderItems.RemoveRange(orderItem);
+            await _context.SaveChangesAsync();
 
-        public async Task UpdateOrderItem(OrderItem orderItem)
+        }
+        public Task UpdateOrderItem(OrderItem orderItem)
         {
             _context.OrderItems.Update(orderItem);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         }
     }
 }

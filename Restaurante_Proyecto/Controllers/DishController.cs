@@ -1,39 +1,48 @@
 ﻿using Application.Enums;
 using Application.Exceptions;
-using Application.Exceptions.Application.Exceptions;
 using Application.Interfaces.ICategory;
 using Application.Interfaces.IDish;
 using Application.Models.Request;
 using Application.Models.Response;
+using Application.Models.Response.Dish;
+using Application.Services.DishServices;
+using Asp.Versioning;
 using Domain.Entities;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace MenuDigital.Controllers
+namespace Restaurante_Proyecto.Controllers
 {
-    [Route("api/v1/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [Asp.Versioning.ApiVersion("1.0")]
     public class DishController : ControllerBase
     {
-        private readonly ICreateDish _createDish;
-        private readonly IUpdateDish _UpdateDish;
-        private readonly ISearchAsync _SearchAsync;
-        private readonly ICategoryExist _CategoryExist;
+        private readonly ICreateDishUseCase _createDish;
+        private readonly IUpdateDishUseCase _UpdateDish;
+        private readonly ISearchAsyncUseCase _SearchAsync;
+        private readonly ICategoryExistsUseCase _CategoryExists;
+        private readonly IGetDishByIdUseCase _getDishByIdUseCase;
+        private readonly IDeleteDishUseCase _deleteDishUseCase;
         public DishController(
-            ICreateDish createDish,
-            IUpdateDish UpdateDish,
-            ISearchAsync SearchAsync,
-            ICategoryExist CategoryExist)
+            ICreateDishUseCase createDish,
+            IUpdateDishUseCase UpdateDish,
+            ISearchAsyncUseCase SearchAsync,
+            ICategoryExistsUseCase CategoryExists,
+            IGetDishByIdUseCase getDishByIdUseCase,
+            IDeleteDishUseCase deleteDishUseCase)
         {
             _createDish = createDish;
             _UpdateDish = UpdateDish;
             _SearchAsync = SearchAsync;
-            _CategoryExist = CategoryExist;
+            _CategoryExists = CategoryExists;
+            _getDishByIdUseCase = getDishByIdUseCase;
+            _deleteDishUseCase = deleteDishUseCase;
         }
 
-        // POST
+        
         /// <summary>
         /// Crear nuevo plato.
         /// </summary>
@@ -51,28 +60,20 @@ namespace MenuDigital.Controllers
         public async Task<IActionResult> CreateDish([FromBody] DishRequest dishRequest)
         {
 
-            //}
+            var categoryExists = await _CategoryExists.CategoryExists(dishRequest.CategoryId);
 
             var createdDish = await _createDish.CreateDish(dishRequest);
-            // if already exist a dish with that name, throw a 409 Conflict 
-            if (createdDish == null)
-            {
-                throw new ConflictException("Un plato con ese nombre ya existe.");
-
-            }
-            return CreatedAtAction(nameof(Search), new { id = createdDish.Id }, createdDish);
+            return CreatedAtAction(nameof(GetDishById), new { id = createdDish.Id }, createdDish);
 
 
         }
-        // GETs
-        // GET with filters
         /// <summary>
         /// Busca platos.
         /// </summary>
         /// <remarks>
         /// Obtiene una lista de platos del menú con opciones de filtrado y ordenamiento.
         /// </remarks>
-        //("search")
+       
         [HttpGet]
         [SwaggerOperation(
         Summary = "Buscar platos",
@@ -83,41 +84,34 @@ namespace MenuDigital.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Search(
             [FromQuery] string? name,
-            [FromQuery] int? categoryId,
-            [FromQuery] OrderPrice? orderPrice = OrderPrice.ASC,
-            [FromQuery] bool onlyActive = true)
+            [FromQuery] int? category,
+            [FromQuery] OrderPrice? sortByPrice = OrderPrice.ASC,
+            [FromQuery] bool? onlyActive = null)
         {
-
-            if (categoryId != 0 && categoryId != null)
-            {
-                var categoryExists = await _CategoryExist.CategoryExist(categoryId.Value);
-                if (!categoryExists)
-                {
-                    throw new NotFoundException($"Categoria con ID {categoryId} no encontrado.");
-                }
-            }
-
-            if (orderPrice != null)
-            {
-                if (orderPrice != OrderPrice.ASC && orderPrice != OrderPrice.DESC)
-                {
-                    throw new OrderPriceException("Invalido orden.Se usa ASC o DESC.");
-                }
-            }
-            var list = await _SearchAsync.SearchAsync(name, categoryId, onlyActive, orderPrice);
-            if (list == null || !list.Any())
-            {
-                throw new NotFoundException("No hay platos encontrados con ese criterio.");
-            }
-
+            var list = await _SearchAsync.SearchAsync(name, category, sortByPrice, onlyActive);
             return Ok(list);
-
+        }
+      
+        /// <summary>
+        /// Obtiene un plato por su ID.
+        /// </summary>
+        /// <remarks>
+        /// Busca un plato específico en el menú usando su identificador único.
+        /// </remarks>
+        [HttpGet("{id}")]
+        [SwaggerOperation(
+        Summary = "Obtener plato por ID",
+        Description = "Obtiene los detalles completos de un plato específico.."
+        )]
+        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetDishById(Guid id)
+        {
+            var dish = await _getDishByIdUseCase.GetDishById(id);
+            return Ok(dish);
         }
 
 
-
-
-        // PUT
         /// <summary>
         /// Actualizar plato existente.
         /// </summary>
@@ -136,39 +130,26 @@ namespace MenuDigital.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateDish(Guid id, [FromBody] DishUpdateRequest dishRequest)
         {
-            //if (dishRequest == null)
-            //{
-            //    throw new RequiredParameterException("Required dish data.");
-            //}
-            //if (string.IsNullOrWhiteSpace(dishRequest.Name))
-            //{
-            //    throw new RequiredParameterException("Name is required.");
-            //}
-            //if (dishRequest.Category == 0)
-            //{
-            //    throw new RequiredParameterException("Category is required.");
-            //}
-            //if (dishRequest.Price <= 0)
-            //{
-            //    throw new InvalidateParameterException("Price must be greater than zero.");
-            //}
-            var categoryExists = await _CategoryExist.CategoryExist(dishRequest.Category);
-            if (!categoryExists)
-            {
-                throw new NotFoundException($"La categoria con ID {dishRequest.Category} no se encuentra.");
-            }
             var result = await _UpdateDish.UpdateDish(id, dishRequest);
-            if (result.NotFound)
-            {
-                throw new NotFoundException($"El plato con el {id} no se encuentra.");
-            }
+            return Ok(result);
+        }
 
-            if (result.NameConflict)
-            {
-                throw new ConflictException($"El plato {dishRequest.Name} ya existe");
-            }
-
-            return Ok(result.UpdatedDish);
+        
+        /// <summary>
+        /// Eliminar plato
+        /// </summary>
+        /// <remarks>
+        /// Elimina un plato del menú del restaurante.
+        /// </remarks>
+        /// 
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> DeleteDish(Guid id, [FromServices] IDeleteDishUseCase _deleteDish)
+        {
+            var result = await _deleteDish.DeleteDish(id);
+            return Ok(result);
         }
     }
 }

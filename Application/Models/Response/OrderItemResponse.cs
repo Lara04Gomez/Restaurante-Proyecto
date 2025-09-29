@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Models.Response.Dish;
 
 namespace Application.Models.Response
 {
@@ -11,8 +12,9 @@ namespace Application.Models.Response
         public long Id { get; set; }
 
         public int Quantity { get; set; }
-        public string Notes { get; set; }
+        public string notes { get; set; }
 
-        public DateTime CreateDate { get; set; }
+        public GenericResponse status { get; set; }
+        public DishShortResponse dish { get; set; }
     }
 }

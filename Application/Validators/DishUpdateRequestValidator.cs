@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Application.Models.Request;
+using FluentValidation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Application.Models.Request;
-using FluentValidation;
-
 
 namespace Application.Validators
 {
@@ -20,11 +19,11 @@ namespace Application.Validators
                 .MaximumLength(255).WithMessage("La descripción no puede superar los 255 caracteres");
             RuleFor(x => x.Price)
                 .GreaterThan(0).WithMessage("El precio debe ser mayor a 0");
-            RuleFor(x => x.Category)
+            RuleFor(x => x.CategoryId)
                 .NotEmpty().WithMessage("La categoria es necesaria")
                 .GreaterThan(0).WithMessage("Debe seleccionar una categoría válida");
-
-
+            RuleFor(x => x.IsActive)
+                .NotNull().WithMessage("Estado solo puede ser 'true' o 'false'");
         }
     }
 }

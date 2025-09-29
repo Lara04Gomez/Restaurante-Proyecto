@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.IDish;
+﻿using Application.Interfaces.IDish.Repository;
 using Domain.Entities;
 using Infrastructure.Data;
 using System;
@@ -18,9 +18,15 @@ namespace Infrastructure.Command
             _context = context;
         }
 
-        public async Task CreateDish(Dish dish)
+        public async Task InsertDish(Dish dish)
         {
-            _context.Dishes.Add(dish); 
+            _context.Dishes.Add(dish);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveDish(Dish dish)
+        {
+            _context.Dishes.Remove(dish);
             await _context.SaveChangesAsync();
         }
 
@@ -28,13 +34,6 @@ namespace Infrastructure.Command
         {
             _context.Dishes.Update(dish);
             await _context.SaveChangesAsync();
-        }
-    
-        public async Task RemoveDish(Dish dish)
-        {
-            _context.Dishes.Remove(dish);
-            await _context.SaveChangesAsync();
-
         }
     }
 }

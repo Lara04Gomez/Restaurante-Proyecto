@@ -13,7 +13,7 @@ namespace Restaurante_Proyecto.Middlewares
     public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate _next;
-        //Tomorrow search if this is okay -REMINDER
+       
         private readonly ILogger<ExceptionHandlerMiddleware> _logger;
 
         public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
@@ -39,8 +39,6 @@ namespace Restaurante_Proyecto.Middlewares
         }
         private async Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
-            //This method select the server response and wrapp with the ApiError
-
             context.Response.ContentType = "application/json";
 
             HttpStatusCode statusCode;
@@ -48,7 +46,13 @@ namespace Restaurante_Proyecto.Middlewares
 
             switch (ex)
             {
-              
+                case RequiredParameterException:
+                    statusCode = HttpStatusCode.BadRequest;
+                    break;
+                case InvalidateParameterException:
+                    statusCode = HttpStatusCode.BadRequest;
+                    break;
+                    statusCode = HttpStatusCode.BadRequest;
                 case NotFoundException:
                     statusCode = HttpStatusCode.NotFound;
                     break;
@@ -63,7 +67,7 @@ namespace Restaurante_Proyecto.Middlewares
                     break;
                 default:
                     statusCode = HttpStatusCode.InternalServerError;
-                    message = "public Server Error";
+                    message = ex.Message;
                     break;
 
 

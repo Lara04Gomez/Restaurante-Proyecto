@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.Data;
 using Domain.Entities;
-using Application.Interfaces.ICategory;
 using Microsoft.EntityFrameworkCore;
+using Application.Interfaces.ICategory.Repository;
 
 namespace Infrastructure.Query
 {
@@ -18,7 +18,7 @@ namespace Infrastructure.Query
             _context = context;
         }
 
-        public async Task<bool> CategoryExistAsync(int id)
+        public async Task<bool> CategoryExistsAsync( int id)
         {
             return await _context.Categories.AnyAsync(c => c.Id == id);
         }

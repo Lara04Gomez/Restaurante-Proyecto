@@ -1,0 +1,17 @@
+﻿using Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Interfaces.IDeliveryType.Repository
+{
+    public interface IDeliveryTypeCommand
+    {
+        Task InsertDeliveryType(DeliveryType deliveryType);
+        Task UpdateDeliveryType(DeliveryType deliveryType);
+        Task RemoveDeliveryType(DeliveryType deliveryType);
+    }
+    
+}
