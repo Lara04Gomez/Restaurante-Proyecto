@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Services.OrderService
 {
@@ -36,12 +37,12 @@ namespace Application.Services.OrderService
             if (!Enum.IsDefined(typeof(ItemStatus), request.status))
                 throw new InvalidateParameterException("El estado especificado no es válido");
 
-            var estadoActual = (ItemStatus)item.StatusId;
-            var estadoNuevo = (ItemStatus)request.status;
+            var State = (ItemStatus)item.StatusId;
+            var NewState = (ItemStatus)request.status;
 
-            if (!EsTransicionValida(item.StatusId, request.status))
+            if (!IsTransitionValid(item.StatusId, request.status))
                 throw new InvalidateParameterException(
-                    $"No se puede cambiar de '{estadoActual}' a '{estadoNuevo}'");
+                    $"No se puede cambiar de '{State}' a '{NewState}'");
 
             item.StatusId = request.status;
 
@@ -70,9 +71,9 @@ namespace Application.Services.OrderService
             else
                 order.StatusId = (int)ItemStatus.Pendiente;
         }
-        private bool EsTransicionValida(int estadoActual, int nuevoEstado)
+        private bool IsTransitionValid(int State, int NewState)
         {
-            var transicionesValidas = new Dictionary<ItemStatus, List<ItemStatus>>
+            var ValidTransitions = new Dictionary<ItemStatus, List<ItemStatus>>
     {
         { ItemStatus.Pendiente, new List<ItemStatus> { ItemStatus.EnPreparacion, ItemStatus.Cancelado } },
         { ItemStatus.EnPreparacion, new List<ItemStatus> { ItemStatus.Listo, ItemStatus.Cancelado } },
@@ -81,11 +82,11 @@ namespace Application.Services.OrderService
         { ItemStatus.Cancelado, new List<ItemStatus>() }
     };
 
-            var actual = (ItemStatus)estadoActual;
-            var nuevo = (ItemStatus)nuevoEstado;
+            var Actual = (ItemStatus)State;
+            var New = (ItemStatus)NewState;
 
-            return transicionesValidas.ContainsKey(actual) &&
-                   transicionesValidas[actual].Contains(nuevo);
+            return ValidTransitions.ContainsKey(Actual) &&
+                  ValidTransitions[Actual].Contains(New);
         }
 
     }

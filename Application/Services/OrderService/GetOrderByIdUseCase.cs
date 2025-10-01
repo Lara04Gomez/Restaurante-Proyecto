@@ -4,6 +4,7 @@ using Application.Interfaces.IOrder.Repository;
 using Application.Models.Response;
 using Application.Models.Response.Dish;
 using Application.Models.Response.Order;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,27 +26,30 @@ namespace Application.Services.OrderService
             if (order == null)
                 throw new NotFoundException($"La orden con Order ID {id} no se encuentra.");
 
-
-            var orderDetails = new OrderDetailsResponse
+            if (order != null)
             {
-                orderNumber = (int)order.OrderId,
-                totalAmount = (double)order.Price,
-                deliveryTo = order.DeliveryTo,
-                notes = order.Notes,
-                status = new GenericResponse { Id = order.StatusId, Name = order.OverallStatus?.Name ?? "Desconocido" },
-                deliveryType = new GenericResponse { Id = order.DeliveryTypeId, Name = order.DeliveryType?.Name ?? "Desconocido" },
-                items = order.OrderItems.Select(item => new OrderItemResponse
+                var orderDetails = new OrderDetailsResponse
                 {
-                    Id = item.OrderItemId,
-                    Quantity = item.Quantity,
-                    notes = item.Notes,
-                    dish = new DishShortResponse { Id = item.DishId, Name = item.Dish?.Name ?? "Desconocido", Image = item.Dish?.Image ?? "No encontrada" },
-                    status = new GenericResponse { Id = item.Status.Id, Name = item.Status?.Name ?? "Desconocido" }
-                }).ToList(),
-                createAt = order.CreateDate,
-                UpdateAt = order.UpdateDate
+                    orderNumber = (int)order.OrderId,
+                    totalAmount = (double)order.Price,
+                    deliveryTo = order.DeliveryTo,
+                    notes = order.Notes,
+                    status = new GenericResponse { Id = order.StatusId, Name = order.OverallStatus?.Name ?? "Desconocido" },
+                    deliveryType = new GenericResponse { Id = order.DeliveryTypeId, Name = order.DeliveryType?.Name ?? "Desconocido" },
+                    items = order.OrderItems.Select(item => new OrderItemResponse
+                    {
+                        Id = (int)item.OrderItemId,
+                        Quantity = item.Quantity,
+                        notes = item.Notes,
+                        dish = new DishShortResponse { Id = item.DishId, Name = item.Dish?.Name ?? "Desconocido", Image = item.Dish?.Image ?? "No encontrada" },
+                        status = new GenericResponse { Id = item.Status.Id, Name = item.Status?.Name ?? "Desconocido" }
+                    }).ToList(),
+                    createAt = order.CreateDate,
+                    UpdateAt = order.UpdateDate
+                };
+                return orderDetails;
             };
-            return orderDetails;
+            return null;
         }
     }
 }
